@@ -1,0 +1,170 @@
+// Mixin collection
+//
+//        list bullet replace with font awesome icon
+//
+//           usage: @include fa-list-icon(icon, offset, colour)
+//              ie: @include fa-list-icon(f00c, -1.4, #ccc)
+//
+//        Icon Before or after element
+//
+//           usage: @include fa-sudo(sudo element, icon, offset, colour)
+//              ie: @include fa-icon-before(true, f00c, -1.4, #ccc)
+//
+//        Vertical Centre element.
+//
+//           usage: @include v-centre();
+//              ie: @include v-centre();
+//
+//        Vertical and Horizontal Centre element.
+//
+//           usage: @include vh-centre();
+//              ie: @include vh-centre();
+//       
+//        Truncate String with Ellipsis
+//
+//           usage: @include truncate();
+//              ie: @include truncate();
+//        
+//        Make Responsive Type
+//
+//           usage: @include font-size();
+//              ie: @include truncate();              
+
+
+// Change a list bullet to Font Awesome icon of choice.
+@mixin fa-list-icon($faIcon: f00c, $faIcon-left: -1.4, $fa-color: inherit){
+	list-style-type: none;
+	li{ 
+		position: relative;
+		&:before{
+			font-family: FontAwesome;
+			position: absolute;
+			left: $faIcon-left * 1em;
+			color: $fa-color;
+			content: unquote("\"")+unquote(str-insert($faIcon,"\\", 1))+unquote("\"");
+		} 
+	}
+}
+
+// icon before or after element
+@mixin fa-sudo($fa-before: false, $fa-icon: f00c, $fa-distance: 0.3, $fa-color: inherit){
+	position: relative;
+	
+	@if $fa-before == true {
+		&:before{
+			font-family: FontAwesome;
+			padding-right: $fa-distance * 1em;
+			color: $fa-color;
+			content: unquote("\"")+unquote(str-insert($fa-icon,"\\", 1))+unquote("\"");
+		} 
+	} @else {
+		&:after{
+			font-family: FontAwesome;
+			padding-left: $fa-distance * 1em;
+			color: $fa-color;
+			content: unquote("\"")+unquote(str-insert($fa-icon,"\\", 1))+unquote("\"");
+		}     
+    }
+}
+
+// set background-color
+@mixin bg-set($bg-color, $type-color: #fff){
+
+	background-color: $bg-color;
+	color: $type-color;
+
+	a{
+		color: $type-color;
+		text-decoration: none;
+		&:hover, &:focus{
+			color: darken($type-color, 10%);
+		}
+	}
+}
+
+@mixin xy-center($horizontal: true, $vertical: true) {
+  position: absolute;
+
+  @if ($horizontal and $vertical) {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+  } @else if ($horizontal) {
+    left: 50%;
+    transform: translate(-50%, 0);
+
+  } @else if ($vertical) {
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+}  
+
+// Truncate String with Ellipsis
+@mixin truncate($truncate-font-size: 16px, $truncate-line-height: 1.4, $truncate-lines-to-show: 3){
+	display: block; /* Fallback for non-webkit */
+	display: -webkit-box;
+	-webkit-line-clamp: $truncate-lines-to-show;
+	-webkit-box-orient: vertical;
+	font-size: $truncate-font-size;
+	height: $truncate-font-size * $truncate-line-height * $truncate-lines-to-show; /* Fallback for non-webkit */
+	line-height: $truncate-line-height;
+	// margin: 0 auto;
+	max-width: 400px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+// Type Responsive   
+$breakpoints: (
+  default:  480px,
+  small:    768px,
+  medium:   992px,
+  large :   1200px
+);
+
+$base-fz: (
+  default : 13px,
+  small   : 14px,
+  medium  : 15px,
+  large   : 15px
+);
+
+@mixin font-size($fs-map: $base-fz, $fs-breakpoints: $breakpoints) {
+  @each $fs-breakpoint, $fs-font-size in $fs-map {
+    @if $fs-breakpoint == default {
+      @include make-font-size($fs-font-size);
+    }
+    @else {
+      // If $fs-font-size is a key that exists in
+      // $fs-breakpoints, use the value
+      @if map-has-key($fs-breakpoints, $fs-breakpoint) {
+        $fs-breakpoint: map-get($fs-breakpoints, $fs-breakpoint);
+      }
+      @media screen and (min-width: $fs-breakpoint) {
+        @include make-font-size($fs-font-size);
+      }
+    }
+  }
+}
+
+// Utility function for mixin font-size
+@mixin make-font-size($fs-font-size) {
+  // If $fs-font-size is a list, include
+  // both font-size and line-height
+  @if type-of($fs-font-size) == "list" {
+    font-size: nth($fs-font-size, 1);
+    @if (length($fs-font-size) > 1) {
+      line-height: nth($fs-font-size, 2);
+    }
+  }
+  @else {
+    font-size: $fs-font-size;
+  }
+}
+
+// Outline Helper
+@mixin myoutline($lineColor){ 
+	outline: solid 1px $lineColor;
+}
+
